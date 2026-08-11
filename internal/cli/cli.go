@@ -282,14 +282,12 @@ func targetsAdd(args []string) int {
 	} else {
 		cfg.Targets = append(cfg.Targets, config.Target{Name: name, Host: host, Folder: folder})
 	}
-	if cfg.Active == "" {
-		cfg.Active = name
-	}
+	cfg.Active = name // the target you just added is the one you want to use
 	if err := cfg.Save(); err != nil {
 		term.Err("%v", err)
 		return 1
 	}
-	term.Ok("target %s → %s", term.Bold(name), host+":"+folder)
+	term.Ok("target %s → %s (now active)", term.Bold(name), host+":"+folder)
 	return 0
 }
 
@@ -377,7 +375,7 @@ func cmdDoctor(args []string) int {
 	} else {
 		check("rsync", false, "not found in PATH — install with: brew install rsync")
 	}
-	check("clipboard", clip.Copy("") == nil, "pbcopy")
+	check("clipboard", clip.Available(), "pbcopy") // check presence without clobbering the clipboard
 
 	cfg, code := load()
 	if cfg == nil {

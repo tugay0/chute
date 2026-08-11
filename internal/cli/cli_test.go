@@ -4,7 +4,26 @@ import (
 	"flag"
 	"reflect"
 	"testing"
+
+	"github.com/tugay0/chute/internal/config"
 )
+
+// TestTargetsAddActivates guards the quickstart flow: adding a target makes it
+// the active one, so `chute push` after `chute targets add` hits the box you
+// just added rather than the built-in placeholder default.
+func TestTargetsAddActivates(t *testing.T) {
+	t.Setenv("CHUTE_CONFIG_DIR", t.TempDir())
+	if code := Run([]string{"targets", "add", "box", "user@example.com", "~/up/"}); code != 0 {
+		t.Fatalf("targets add exit=%d, want 0", code)
+	}
+	cfg, err := config.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Active != "box" {
+		t.Fatalf("active=%q, want %q", cfg.Active, "box")
+	}
+}
 
 // TestParseFlagsInterspersed guards the bug where Go's flag package stops at the
 // first positional, so "push file --to staging" swallowed the flag as a path.

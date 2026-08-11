@@ -59,7 +59,7 @@ curl -fSL --proto '=https' "$url" -o "$tmp/$asset" || die "download failed: $url
 # checksum (best-effort: only if checksums.txt is published)
 if curl -fsSL "https://github.com/${REPO}/releases/download/${tag}/checksums.txt" -o "$tmp/checksums.txt" 2>/dev/null; then
   sha="shasum -a 256"; command -v sha256sum >/dev/null 2>&1 && sha="sha256sum"
-  want="$(grep " ${asset}\$" "$tmp/checksums.txt" | awk '{print $1}')"
+  want="$(awk -v f="$asset" '$2==f {print $1}' "$tmp/checksums.txt")"
   if [ -n "$want" ]; then
     got="$($sha "$tmp/$asset" | awk '{print $1}')"
     [ "$want" = "$got" ] || die "checksum mismatch for ${asset}"
@@ -77,7 +77,9 @@ if [ -z "$dir" ]; then
   if [ -w /usr/local/bin ] 2>/dev/null; then dir="/usr/local/bin"
   else dir="$HOME/.local/bin"; fi
 fi
-mkdir -p "$dir" 2>/dev/null || sudo mkdir -p "$dir"
+mkdir -p "$dir" 2>/dev/null \
+  || { command -v sudo >/dev/null 2>&1 && sudo mkdir -p "$dir"; } \
+  || die "cannot create $dir (set CHUTE_INSTALL_DIR to a writable path)"
 
 if mv "$tmp/$BIN" "$dir/$BIN" 2>/dev/null; then :
 elif command -v sudo >/dev/null 2>&1; then
@@ -90,7 +92,11 @@ fi
 ok "installed $BIN $version → $dir/$BIN"
 case ":$PATH:" in
   *":$dir:"*) ;;
-  *) rc="$HOME/.zshrc"; case "${SHELL:-}" in *bash) rc="$HOME/.bashrc" ;; esac
-     info "add $dir to your PATH:  echo 'export PATH=\"$dir:\$PATH\"' >> $rc" ;;
+  *) rc="$HOME/.zshrc"
+     case "${SHELL:-}" in
+       *bash) rc="$HOME/.bashrc" ;;
+       *fish) rc="$HOME/.config/fish/config.fish" ;;
+     esac
+     info "add $dir to your PATH (best-effort hint):  echo 'export PATH=\"$dir:\$PATH\"' >> $rc" ;;
 esac
 info "next: chute targets add box user@host '~/inbox/'  &&  chute push somefile"

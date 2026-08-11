@@ -126,12 +126,15 @@ func Watch(t config.Target, dir string, interval time.Duration, del bool) error 
 		}
 		if first || fp != last {
 			if err := sync(); err != nil {
-				term.Err("sync failed: %v", err)
+				// Don't advance state on failure — retry the same change on the
+				// next tick until it lands, so a transient blip can't silently
+				// drop the edit.
+				term.Err("sync failed (will retry): %v", err)
 			} else {
 				term.Ok("synced at %s", time.Now().Format("15:04:05"))
+				last = fp
+				first = false
 			}
-			last = fp
-			first = false
 		}
 		time.Sleep(interval)
 	}
@@ -139,7 +142,10 @@ func Watch(t config.Target, dir string, interval time.Duration, del bool) error 
 
 func runRsync(args []string) error {
 	cmd := exec.Command("rsync", args...)
-	cmd.Stdout = os.Stdout
+	// rsync's own progress output is diagnostic — send it to stderr so chute's
+	// stdout carries only the paste-ready remote paths (keeps `chute push f |
+	// pbcopy` and `p=$(chute push f)` clean).
+	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("rsync: %w", err)

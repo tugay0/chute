@@ -84,7 +84,14 @@ func (c *Config) Save() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(Path(), append(b, '\n'), 0o600)
+	// Write to a temp file then rename: os.Rename is atomic on the same
+	// filesystem, so a crash mid-write can't leave a truncated config that
+	// bricks every later command at Load().
+	tmp := Path() + ".tmp"
+	if err := os.WriteFile(tmp, append(b, '\n'), 0o600); err != nil {
+		return err
+	}
+	return os.Rename(tmp, Path())
 }
 
 // Find returns a pointer to the named target, or false.

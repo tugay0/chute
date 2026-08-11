@@ -29,6 +29,12 @@ func Copy(s string) error {
 	return cmd.Run()
 }
 
+// Available reports whether a clipboard tool exists, without touching the
+// clipboard (so diagnostics like `chute doctor` don't clobber its contents).
+func Available() bool {
+	return have("pbcopy") || have("wl-copy") || have("xclip") || have("xsel")
+}
+
 func have(bin string) bool {
 	_, err := exec.LookPath(bin)
 	return err == nil

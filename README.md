@@ -58,7 +58,7 @@ Chute shells out to `ssh` and `rsync`, which ship with macOS and every Linux box
 <table>
 <tr><td width="34"><b>1</b></td><td>
 
-**Point Chute at your box.** Hosts are `~/.ssh/config` aliases or plain `user@host`.
+**Point Chute at your box** (this becomes your active target). Hosts are `~/.ssh/config` aliases or plain `user@host`.
 
 ```bash
 chute targets add box user@1.2.3.4 '~/inbox/'

@@ -62,7 +62,7 @@ runs every **25 s** so the light is honest even when idle.
 - Primary: shells out to `~/.claude/skills/push/push.sh <paths…>` — byte-for-byte
   the same path as the `/push` skill (`rsync -avz` → `remote-box:inbox/`). If you
   ever repoint `push.sh`, Chute follows automatically.
-- Fallback (if the helper is missing): `rsync -az <paths…> remote-box:inbox/`.
+- Fallback (if the helper is missing): `rsync -avz <paths…> remote-box:inbox/`.
 - Child processes get an explicit `PATH` + `HOME` so `ssh`/`rsync` resolve
   `~/.ssh/config` and the key even when launched from Finder (sparse launchd env).
 
@@ -125,6 +125,7 @@ into a signed `.app` bundle (no Xcode project required).
 
 ```
 Sources/
+  FileStrip.swift       in-notch recent-files grid (thumbnails, drag-out, trash zone)
   Status.swift          sync state machine + presentation (colour/headline/glyph)
   Uploader.swift        transfer queue, push.sh/rsync, ssh heartbeat, offline resend, copy-path
   NotchView.swift       drawn card, drag-drop, click-to-send, height-driven drawing
@@ -164,11 +165,8 @@ build.sh                swiftc → build/Chute.app → ad-hoc codesign
 
 ## Non-goals (v0.1)
 
-- Bidirectional sync / pull (that's the `pull` skill's job).
 - Per-file progress bars, transfer history UI, retries UI.
-- Configurable destinations via GUI (destination is `remote-box:inbox/`, changed
-  by editing `push.sh` or the fallback constant).
-- Login-item auto-start (add via System Settings → Login Items for now).
+- A packaged installer / notarized distribution (self-signed, build-it-yourself).
 
 ## Renaming
 

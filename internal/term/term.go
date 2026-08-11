@@ -14,11 +14,15 @@ func colorEnabled() bool {
 	if os.Getenv("NO_COLOR") != "" || os.Getenv("CHUTE_NO_COLOR") != "" {
 		return false
 	}
-	fi, err := os.Stdout.Stat()
-	if err != nil {
-		return false
-	}
-	return fi.Mode()&os.ModeCharDevice != 0
+	// Require BOTH streams to be terminals: status lines go to stderr and the
+	// styled listings go to stdout, so if either is redirected we must stay
+	// plain or ANSI escapes leak into the redirected file/pipe.
+	return isTTY(os.Stdout) && isTTY(os.Stderr)
+}
+
+func isTTY(f *os.File) bool {
+	fi, err := f.Stat()
+	return err == nil && fi.Mode()&os.ModeCharDevice != 0
 }
 
 func wrap(code, s string) string {
