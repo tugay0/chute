@@ -13,6 +13,7 @@ func usage() {
 		term.Bold("USAGE\n")+
 		"  chute <command> [args]\n\n"+
 		term.Bold("COMMANDS\n")+
+		"  init               point Chute at your VPS (guided one-time setup)\n"+
 		"  push <path>...     send files or folders up to the remote (path lands on your clipboard)\n"+
 		"  pull <path>...     bring files down from the remote\n"+
 		"  watch [dir]        keep a local folder mirrored up to the remote\n"+
@@ -21,7 +22,8 @@ func usage() {
 		"  doctor             check ssh/rsync and test the connection\n"+
 		"  version            print the version\n\n"+
 		term.Bold("EXAMPLES\n")+
-		"  chute push screenshot.png              # → remote-box:~/inbox/, path copied\n"+
+		"  chute init                             # one-time: point Chute at your box\n"+
+		"  chute push screenshot.png              # → your box:~/inbox/, path copied\n"+
 		"  chute push ./dist --to staging         # send a folder to a named target\n"+
 		"  chute pull logs/app.log --dest ~/tmp   # grab a file off the box\n"+
 		"  chute watch ./out                      # auto-sync a build folder\n"+

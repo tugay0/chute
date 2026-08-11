@@ -11,16 +11,24 @@ func TestLoadDefaultWhenMissing(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if c.Active != "inbox" || len(c.Targets) != 1 || c.Targets[0].Host != "remote-box" {
-		t.Fatalf("unexpected default config: %+v", c)
+	// No config yet → no targets; commands should point the user at `chute init`.
+	if len(c.Targets) != 0 || c.Active != "" {
+		t.Fatalf("expected empty default, got: %+v", c)
+	}
+	if _, err := c.Resolve(""); err != ErrNoTargets {
+		t.Fatalf("Resolve on empty config = %v, want ErrNoTargets", err)
 	}
 }
 
 func TestSaveLoadRoundTrip(t *testing.T) {
 	t.Setenv("CHUTE_CONFIG_DIR", t.TempDir())
-	c := Default()
-	c.Targets = append(c.Targets, Target{Name: "staging", Host: "user@1.2.3.4", Folder: "~/up/"})
-	c.Active = "staging"
+	c := Config{
+		Active: "staging",
+		Targets: []Target{
+			{Name: "inbox", Host: "remote-box", Folder: "~/inbox/"},
+			{Name: "staging", Host: "user@1.2.3.4", Folder: "~/up/"},
+		},
+	}
 	if err := c.Save(); err != nil {
 		t.Fatalf("Save: %v", err)
 	}
@@ -41,7 +49,7 @@ func TestSaveLoadRoundTrip(t *testing.T) {
 }
 
 func TestResolveUnknown(t *testing.T) {
-	c := Default()
+	c := Config{Active: "inbox", Targets: []Target{{Name: "inbox", Host: "remote-box", Folder: "~/inbox/"}}}
 	if _, err := c.Resolve("ghost"); err == nil {
 		t.Fatal("expected error for unknown target")
 	}

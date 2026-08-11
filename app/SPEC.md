@@ -137,7 +137,7 @@ Sources/
   SettingsWindow.swift  SwiftUI prefs (destination/sound/hotkey/favorites/login), recorder
   HotKeyManager.swift   Carbon global hotkeys (remappable capture + per-favorite)
   main.swift            AppDelegate, menu-bar item + history submenu, run loop
-Resources/Info.plist    LSUIElement (no dock icon), bundle id co.ambient.chute
+Resources/Info.plist    LSUIElement (no dock icon), bundle id com.github.tugay0.chute
 build.sh                swiftc → build/Chute.app → ad-hoc codesign
 ```
 

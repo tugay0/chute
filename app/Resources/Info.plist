@@ -7,7 +7,7 @@
     <key>CFBundleDisplayName</key>
     <string>Chute</string>
     <key>CFBundleIdentifier</key>
-    <string>co.ambient.chute</string>
+    <string>com.github.tugay0.chute</string>
     <key>CFBundleExecutable</key>
     <string>Chute</string>
     <key>CFBundlePackageType</key>

@@ -3,6 +3,7 @@
 package cli
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -26,6 +27,8 @@ func Run(args []string) int {
 		return 0
 	}
 	switch args[0] {
+	case "init", "setup":
+		return cmdInit(args[1:])
 	case "push", "up":
 		return cmdPush(args[1:])
 	case "pull", "down":
@@ -48,6 +51,76 @@ func Run(args []string) int {
 		term.Err("unknown command %q — run %s", args[0], term.Bold("chute help"))
 		return 2
 	}
+}
+
+// ---- init ----------------------------------------------------------------
+
+func cmdInit(args []string) int {
+	// Non-interactive: `chute init <name> <host> <folder>` behaves like add.
+	if len(args) == 3 {
+		return targetsAdd(args)
+	}
+	if len(args) != 0 {
+		term.Err("usage: %s   (interactive)   |   %s", term.Bold("chute init"), term.Bold("chute init <name> <host> <folder>"))
+		return 2
+	}
+
+	in := bufio.NewScanner(os.Stdin)
+	ask := func(prompt, def string) string {
+		if def != "" {
+			fmt.Fprintf(os.Stderr, "%s %s: ", prompt, term.Dim("["+def+"]"))
+		} else {
+			fmt.Fprintf(os.Stderr, "%s: ", prompt)
+		}
+		if !in.Scan() {
+			return def
+		}
+		if v := strings.TrimSpace(in.Text()); v != "" {
+			return v
+		}
+		return def
+	}
+
+	fmt.Fprintln(os.Stderr, term.Bold("chute init")+" — point Chute at your VPS.")
+	fmt.Fprintln(os.Stderr, term.Dim("  The host is an ~/.ssh/config alias or user@host; SSH to it should already work."))
+	host := ask("SSH host (e.g. user@1.2.3.4 or an ssh alias)", "")
+	if host == "" {
+		term.Err("a host is required")
+		return 2
+	}
+	folder := config.NormalizeFolder(ask("Remote folder", "~/inbox/"))
+	name := ask("Name for this target", "box")
+
+	t := config.Target{Name: name, Host: host, Folder: folder}
+	if err := config.ValidateTarget(t); err != nil {
+		term.Err("%v", err)
+		return 1
+	}
+	cfg, code := load()
+	if cfg == nil {
+		return code
+	}
+	if existing, ok := cfg.Find(name); ok {
+		existing.Host, existing.Folder = host, folder
+	} else {
+		cfg.Targets = append(cfg.Targets, t)
+	}
+	cfg.Active = name
+	if err := cfg.Save(); err != nil {
+		term.Err("%v", err)
+		return 1
+	}
+	term.Ok("saved %s → %s (active)", term.Bold(name), t.Dest())
+
+	fmt.Fprint(os.Stderr, term.Cyan("→")+" testing connection… ")
+	if reachable(t) {
+		fmt.Fprintln(os.Stderr, term.Green("reachable ✓"))
+	} else {
+		fmt.Fprintln(os.Stderr, term.Yellow("couldn't connect"))
+		term.Warn("make sure `ssh %s` works (accept the host key once), then run `chute doctor`", host)
+	}
+	fmt.Fprintln(os.Stderr, term.Dim("next: ")+term.Bold("chute push somefile"))
+	return 0
 }
 
 // ---- push ----------------------------------------------------------------
@@ -192,6 +265,10 @@ func cmdConfig(args []string) int {
 			return code
 		}
 		fmt.Println(term.Dim("config: ") + config.Path())
+		if len(cfg.Targets) == 0 {
+			term.Warn("no targets yet — run %s to point Chute at your VPS", term.Bold("chute init"))
+			return 0
+		}
 		fmt.Println(term.Dim("active: ") + term.Bold(cfg.Active))
 		fmt.Println()
 		printTargets(cfg)
@@ -498,7 +575,7 @@ func resolve(cfg *config.Config, name string) (config.Target, error) {
 
 func printTargets(cfg *config.Config) {
 	if len(cfg.Targets) == 0 {
-		term.Warn("no targets configured — add one: chute targets add inbox remote-box '~/inbox/'")
+		term.Warn("no targets yet — run %s (or: chute targets add <name> <user@host> '<folder>')", term.Bold("chute init"))
 		return
 	}
 	for _, t := range cfg.Targets {

@@ -28,14 +28,14 @@ type Config struct {
 	Targets []Target `json:"targets"`
 }
 
-// Default is what you get before you've configured anything — it matches the
-// Chute menu-bar app's out-of-the-box destination.
-func Default() Config {
-	return Config{
-		Active:  "inbox",
-		Targets: []Target{{Name: "inbox", Host: "remote-box", Folder: "~/inbox/"}},
-	}
-}
+// ErrNoTargets is returned when nothing has been configured yet, so callers can
+// point the user at `chute init` instead of a confusing "no such target".
+var ErrNoTargets = errors.New("no target configured yet — run 'chute init' to point Chute at your VPS")
+
+// Default is an empty config: there are no targets until the user runs
+// `chute init` (or `chute targets add`). We deliberately don't ship a
+// placeholder host, so a fresh install never pushes at someone else's box.
+func Default() Config { return Config{} }
 
 // Dir is the config directory, honoring CHUTE_CONFIG_DIR and XDG_CONFIG_HOME.
 func Dir() string {
@@ -66,10 +66,7 @@ func Load() (*Config, error) {
 	if err := json.Unmarshal(b, &c); err != nil {
 		return nil, errors.New("config file is not valid JSON (" + Path() + "): " + err.Error())
 	}
-	if len(c.Targets) == 0 {
-		c.Targets = Default().Targets
-	}
-	if c.Active == "" {
+	if c.Active == "" && len(c.Targets) > 0 {
 		c.Active = c.Targets[0].Name
 	}
 	return &c, nil
@@ -106,13 +103,16 @@ func (c *Config) Find(name string) (*Target, bool) {
 
 // Resolve returns the named target, or the active one when name is empty.
 func (c *Config) Resolve(name string) (Target, error) {
+	if len(c.Targets) == 0 {
+		return Target{}, ErrNoTargets
+	}
 	if name == "" {
 		name = c.Active
 	}
 	if t, ok := c.Find(name); ok {
 		return *t, nil
 	}
-	if len(c.Targets) > 0 && name == c.Active {
+	if name == c.Active {
 		return c.Targets[0], nil
 	}
 	return Target{}, errors.New("no such target: " + name + " (see 'chute targets')")

@@ -6,9 +6,9 @@ import Cocoa
 final class Uploader {
     static let shared = Uploader()
 
-    private let q = DispatchQueue(label: "co.ambient.chute.upload")
-    private let captureQ = DispatchQueue(label: "co.ambient.chute.capture")  // interactive; must not block transfers
-    private let probeQ = DispatchQueue(label: "co.ambient.chute.probe")      // heartbeat; off the upload lane
+    private let q = DispatchQueue(label: "com.github.tugay0.chute.upload")
+    private let captureQ = DispatchQueue(label: "com.github.tugay0.chute.capture")  // interactive; must not block transfers
+    private let probeQ = DispatchQueue(label: "com.github.tugay0.chute.probe")      // heartbeat; off the upload lane
     private var heartbeat: Timer?
 
     // Main-thread only.

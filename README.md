@@ -58,10 +58,11 @@ Chute shells out to `ssh` and `rsync`, which ship with macOS and every Linux box
 <table>
 <tr><td width="34"><b>1</b></td><td>
 
-**Point Chute at your box** (this becomes your active target). Hosts are `~/.ssh/config` aliases or plain `user@host`.
+**Point Chute at your box.** One-time guided setup — it asks for the host + folder and tests the connection. (The host is an `~/.ssh/config` alias or `user@host`; SSH to it should already work.)
 
 ```bash
-chute targets add box user@1.2.3.4 '~/inbox/'
+chute init
+# or non-interactively:  chute targets add box user@1.2.3.4 '~/inbox/'
 ```
 
 </td></tr>
@@ -114,7 +115,7 @@ Chute is deliberately boring: every transfer is a plain `rsync -az --progress -e
 have typed yourself. There's no daemon, no account, no telemetry.
 
 - **Config** lives at `~/.config/chute/config.json` (respects `XDG_CONFIG_HOME`). A *target* is a
-  name → `host:folder`. The default is `inbox → remote-box:~/inbox/`.
+  name → `host:folder`. There's no target until you run `chute init` (or `chute targets add`) — Chute never ships a placeholder host.
 - **Hosts** are whatever `ssh` understands — an alias from `~/.ssh/config` or `user@host`. Chute
   never touches your keys or agent; it just runs `ssh`.
 - **Clipboard**: on success `push` copies the remote path (via `pbcopy`, or `wl-copy`/`xclip`/`xsel`

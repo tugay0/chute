@@ -93,7 +93,7 @@ final class FileTile: NSView, NSDraggingSource {
     private var downAt: NSPoint = .zero
     private var dragging = false
 
-    private static let thumbQueue = DispatchQueue(label: "co.ambient.chute.thumbs", qos: .userInitiated)
+    private static let thumbQueue = DispatchQueue(label: "com.github.tugay0.chute.thumbs", qos: .userInitiated)
     private static var cache: [String: NSImage] = [:]
 
     init(url: URL, isDir: Bool, rowMode: Bool) {

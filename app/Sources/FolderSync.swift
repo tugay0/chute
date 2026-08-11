@@ -13,7 +13,7 @@ final class FolderSync {
 
     struct Meta: Codable { let size: Int64; let mtime: Double }
 
-    private let q = DispatchQueue(label: "co.ambient.chute.foldersync")
+    private let q = DispatchQueue(label: "com.github.tugay0.chute.foldersync")
     private var timer: Timer?
     private var running = false          // main-thread only
     private let stateURL: URL
