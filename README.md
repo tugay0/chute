@@ -15,12 +15,18 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT"></a>
 </p>
 
+<p align="center">
+  <img src="docs/demo.svg" alt="A real chute session: 'chute init' sets up a target, then 'chute push report.pdf' sends the file and copies ~/inbox/report.pdf to the clipboard" width="86%">
+</p>
+
 ---
 
 ## Why
 
-You live in a terminal on a remote box, but getting a file *onto* it is clumsy — save it,
-remember the `scp`/`rsync` incantation, retype the path. **Chute** makes it a reflex:
+Yes, it's `ssh` + `rsync` underneath — you could type that yourself. The point is the part
+rsync *doesn't* do: **the instant your file lands, its remote path is on your clipboard**, so
+you paste it straight into the box's shell (or the agent running there) instead of retyping
+`~/inbox/whatever.pdf`. No flags to remember, no host/path bookkeeping.
 
 ```console
 $ chute push report.pdf
@@ -29,7 +35,9 @@ $ chute push report.pdf
   ~/inbox/report.pdf
 ```
 
-The remote path is already on your clipboard, ready to paste into the box's shell.
+If you spend your day in a terminal on a VPS, that clipboard round-trip is the whole feature.
+Everything else — named targets, `chute init`, folder `watch`, `doctor`, the macOS drop-pill —
+is convenience around it.
 
 ## Install
 

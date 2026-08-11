@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="432" viewBox="0 0 900 432" role="img" aria-label="A real chute session: chute init sets up a target, chute push sends a file and copies the remote path to the clipboard">
+  <defs>
+    <style>
+      .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 17px; }
+    </style>
+  </defs>
+
+  <rect width="900" height="432" rx="14" fill="#0b0f14" stroke="#ffffff" stroke-opacity="0.09"/>
+  <!-- title bar -->
+  <circle cx="28" cy="26" r="6" fill="#ff5f57"/>
+  <circle cx="50" cy="26" r="6" fill="#febc2e"/>
+  <circle cx="72" cy="26" r="6" fill="#28c840"/>
+  <text x="450" y="31" text-anchor="middle" class="m" font-size="13" fill="#6e7681">chute</text>
+  <line x1="0" y1="48" x2="900" y2="48" stroke="#ffffff" stroke-opacity="0.06"/>
+
+  <!-- chute init -->
+  <text x="28" y="86" class="m"><tspan fill="#3fb950">$</tspan><tspan fill="#e6edf3"> chute init</tspan></text>
+  <text x="28" y="115" class="m"><tspan fill="#8b949e">  SSH host: </tspan><tspan fill="#79c0ff">remote-box</tspan></text>
+  <text x="28" y="144" class="m"><tspan fill="#8b949e">  Remote folder [~/inbox/]: </tspan><tspan fill="#6e7681">↵</tspan></text>
+  <text x="28" y="173" class="m"><tspan fill="#8b949e">  Name [box]: </tspan><tspan fill="#79c0ff">box</tspan></text>
+  <text x="28" y="202" class="m"><tspan fill="#3fb950">✓</tspan><tspan fill="#e6edf3"> saved </tspan><tspan fill="#e6edf3" font-weight="700">box</tspan><tspan fill="#e6edf3"> → remote-box:~/inbox/ </tspan><tspan fill="#6e7681">(active)</tspan></text>
+  <text x="28" y="231" class="m"><tspan fill="#58a6ff">→</tspan><tspan fill="#8b949e"> testing connection… </tspan><tspan fill="#3fb950">reachable ✓</tspan></text>
+
+  <!-- chute push -->
+  <text x="28" y="289" class="m"><tspan fill="#3fb950">$</tspan><tspan fill="#e6edf3"> chute push report.pdf</tspan></text>
+  <text x="28" y="318" class="m"><tspan fill="#58a6ff">→</tspan><tspan fill="#8b949e"> pushing 1 item(s) → remote-box:~/inbox/</tspan></text>
+  <text x="28" y="347" class="m"><tspan fill="#3fb950">✓</tspan><tspan fill="#e6edf3"> sent — remote path copied to clipboard:</tspan></text>
+  <text x="28" y="376" class="m"><tspan fill="#e6edf3">  ~/inbox/report.pdf</tspan><tspan fill="#6e7681">    ← now just ⌘V into the box's shell</tspan></text>
+
+  <!-- cursor -->
+  <text x="28" y="405" class="m"><tspan fill="#3fb950">$</tspan></text>
+  <rect x="44" y="391" width="9" height="17" fill="#3fb950" opacity="0.9"/>
+</svg>
