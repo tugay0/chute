@@ -1,0 +1,67 @@
+# GoReleaser config — builds cross-platform binaries and publishes a GitHub
+# release on every pushed v* tag (see .github/workflows/release.yml).
+#
+# The Homebrew formula lives in the tugay0/homebrew-tap repo. It's currently
+# maintained by hand (see that repo's Formula/chute.rb). To auto-update it on
+# every release, uncomment the `brews:` block at the bottom of this file and add
+# a HOMEBREW_TAP_GITHUB_TOKEN secret (a PAT with write access to homebrew-tap)
+# to the release workflow — the default GITHUB_TOKEN can't push to another repo.
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: chute
+    main: ./cmd/chute
+    binary: chute
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X github.com/tugay0/chute/internal/cli.Version={{.Version}}
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+
+archives:
+  - id: chute
+    formats: [tar.gz]
+    # Must match the asset name install.sh expects:
+    #   chute_<version>_<os>_<arch>.tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: tugay0
+    name: chute
+  draft: false
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+# To auto-publish the Homebrew formula on release, uncomment this and provide a
+# HOMEBREW_TAP_GITHUB_TOKEN secret (PAT with write access to tugay0/homebrew-tap)
+# in .github/workflows/release.yml.
+#
+# brews:
+#   - name: chute
+#     repository:
+#       owner: tugay0
+#       name: homebrew-tap
+#       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+#     homepage: "https://github.com/tugay0/chute"
+#     description: "Shoot files between your Mac and your VPS"
+#     license: "MIT"
+#     test: |
+#       system "#{bin}/chute", "version"

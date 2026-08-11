@@ -1,0 +1,14 @@
+# Go
+/chute
+/dist/
+*.test
+*.out
+
+# macOS app build artifacts (app/)
+app/build/
+app/dst/
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
