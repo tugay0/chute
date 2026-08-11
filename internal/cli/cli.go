@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -17,8 +18,22 @@ import (
 	"github.com/tugay0/chute/internal/transfer"
 )
 
-// Version is overridden at build time via -ldflags "-X ...cli.Version=...".
-var Version = "0.1.0"
+// Version is injected at build time via -ldflags for release binaries. For
+// `go install`-built binaries (no ldflags) it's derived from the module version
+// in the embedded build info, so `chute version` is accurate on every path.
+var Version = ""
+
+func version() string {
+	if Version != "" {
+		return Version
+	}
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		if v := bi.Main.Version; v != "" && v != "(devel)" {
+			return strings.TrimPrefix(v, "v")
+		}
+	}
+	return "dev"
+}
 
 // Run dispatches a command and returns the process exit code.
 func Run(args []string) int {
@@ -42,7 +57,7 @@ func Run(args []string) int {
 	case "doctor":
 		return cmdDoctor(args[1:])
 	case "version", "--version", "-v":
-		fmt.Println("chute " + Version)
+		fmt.Println("chute " + version())
 		return 0
 	case "help", "--help", "-h":
 		usage()
