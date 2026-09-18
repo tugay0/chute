@@ -110,12 +110,14 @@ Run `chute doctor` any time to check `ssh`/`rsync` and test the connection.
 
 | Command | What it does |
 |---|---|
+| `chute init` | Guided one-time setup: asks for host + folder and tests the connection. |
 | `chute push <path>... [--to name] [--dry-run] [--no-copy]` | Send files/folders up; prints & copies the remote path. |
 | `chute pull <remote>... [--from name] [--dest dir]` | Bring files down (remote paths are relative to the target folder). |
 | `chute watch [dir] [--to name] [--interval 2s] [--delete]` | Mirror a local folder up on change (polling, no extra deps). |
 | `chute targets [list \| add <name> <host> <folder> \| use <name> \| rm <name>]` | Manage send targets. |
 | `chute config [show \| path \| edit]` | Show config, print its path, or open it in `$EDITOR`. |
 | `chute doctor [--to name]` | Diagnose ssh/rsync/clipboard and probe the target. |
+| `chute version` | Print the installed version. |
 
 ## How it works
 
