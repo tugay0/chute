@@ -139,6 +139,10 @@ have typed yourself. There's no daemon, no account, no telemetry.
 | `CHUTE_RSYNC_OPTS` | base rsync flags | `-az --progress` |
 | `CHUTE_CONFIG_DIR` | config directory | `~/.config/chute` |
 | `NO_COLOR` | disable colored output | unset |
+| `CHUTE_NO_COLOR` | same, but Chute-only (leaves other tools colored) | unset |
+
+Color also switches itself off whenever stdout or stderr isn't a terminal, so piping or
+redirecting Chute never leaks ANSI escapes into the output.
 
 ## The menu-bar companion (macOS)
 
